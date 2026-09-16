@@ -8,7 +8,8 @@ TimeDiff is a fast, private, browser-first time utility for repeated date and ti
 - Date difference and duration calculations
 - Add and subtract days from a date
 - Business-day calculations with custom holiday support
-- Timezone conversion
+- Custom weekend configuration
+- Timezone conversion across all supported IANA time zones
 - Recurring date generation
 - Unix timestamp conversion
 - Shareable calculation links
@@ -39,6 +40,12 @@ npm run build
 ```bash
 npm test
 ```
+
+## Open source docs
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
+- [LICENSE](LICENSE)
 
 ## Why this project exists
 

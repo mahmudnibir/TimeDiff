@@ -1,13 +1,23 @@
 const MS_PER_DAY = 1000 * 60 * 60 * 24
 
-export const TIME_ZONES = [
-  'UTC',
-  'Asia/Dhaka',
-  'Asia/Tokyo',
-  'America/New_York',
-  'Europe/London',
-  'Europe/Paris',
-]
+export const TIME_ZONES = (() => {
+  try {
+    return Intl.supportedValuesOf('timeZone')
+  } catch {
+    return [
+      'UTC',
+      'Asia/Dhaka',
+      'Asia/Tokyo',
+      'America/New_York',
+      'Europe/London',
+      'Europe/Paris',
+      'America/Los_Angeles',
+      'Australia/Sydney',
+      'Africa/Cairo',
+      'Asia/Singapore',
+    ]
+  }
+})()
 
 function normalizeDateInput(value) {
   if (!value) return null
@@ -130,6 +140,7 @@ export function calculateBusinessDays(startDate, endDate, options = {}) {
   const excludeWeekends = options.excludeWeekends ?? true
   const holidays = parseHolidayList(options.holidays)
   const holidaySet = new Set(holidays)
+  const weekendSet = new Set((options.weekendDays ?? [0, 6]).map((day) => Number(day)))
 
   let workingDays = 0
   let weekendDays = 0
@@ -144,7 +155,7 @@ export function calculateBusinessDays(startDate, endDate, options = {}) {
 
     if (holidaySet.has(isoDate)) {
       holidayDays += 1
-    } else if (excludeWeekends && (day === 0 || day === 6)) {
+    } else if (excludeWeekends && weekendSet.has(day)) {
       weekendDays += 1
     } else {
       workingDays += 1

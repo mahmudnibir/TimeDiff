@@ -83,6 +83,7 @@ function App() {
   const [businessStart, setBusinessStart] = useState('2026-09-16')
   const [businessEnd, setBusinessEnd] = useState('2026-09-30')
   const [holidayInput, setHolidayInput] = useState('2026-09-22, 2026-10-01')
+  const [weekendDays, setWeekendDays] = useState([0, 6])
   const [timestampInput, setTimestampInput] = useState('2026-09-16T00:00:00Z')
   const [timeZone, setTimeZone] = useState('Asia/Tokyo')
   const [recurringStart, setRecurringStart] = useState('2026-09-16')
@@ -130,11 +131,12 @@ function App() {
       return calculateBusinessDays(businessStart, businessEnd, {
         excludeWeekends: true,
         holidays: holidayInput,
+        weekendDays,
       })
     } catch {
       return null
     }
-  }, [businessStart, businessEnd, holidayInput])
+  }, [businessStart, businessEnd, holidayInput, weekendDays])
 
   const timestampValue = useMemo(() => {
     try {
@@ -381,6 +383,34 @@ function App() {
             />
           </label>
 
+          <div className="weekend-selector">
+            <span>Weekend days</span>
+            <div className="weekend-options">
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => {
+                const isSelected = weekendDays.includes(index)
+
+                return (
+                  <button
+                    key={day}
+                    type="button"
+                    className={isSelected ? 'weekend-option selected' : 'weekend-option'}
+                    onClick={() => {
+                      setWeekendDays((current) => {
+                        const next = current.includes(index)
+                          ? current.filter((item) => item !== index)
+                          : [...current, index].sort((a, b) => a - b)
+
+                        return next.length ? next : [0, 6]
+                      })
+                    }}
+                  >
+                    {day}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <div className="result-card">
             <p className="eyebrow">WORKING DAYS</p>
             <h2>{businessRange ? `${businessRange.workingDays} days` : '—'}</h2>
@@ -405,11 +435,13 @@ function App() {
             </label>
             <label>
               <span>Timezone</span>
-              <select value={timeZone} onChange={(event) => setTimeZone(event.target.value)}>
-                {TIME_ZONES.map((zone) => (
-                  <option key={zone} value={zone}>{zone}</option>
-                ))}
-              </select>
+              <div className="custom-select-wrap">
+                <select className="custom-select" value={timeZone} onChange={(event) => setTimeZone(event.target.value)}>
+                  {TIME_ZONES.map((zone) => (
+                    <option key={zone} value={zone}>{zone}</option>
+                  ))}
+                </select>
+              </div>
             </label>
           </div>
 

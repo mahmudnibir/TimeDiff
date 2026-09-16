@@ -144,17 +144,41 @@ select {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid rgba(17, 17, 17, 0.2);
-  border-radius: 12px;
-  background: #fafafa;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 100%);
   color: #111111;
   padding: 12px 14px;
   font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid #111111;
-  outline-offset: 2px;
+  outline: none;
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.custom-select-wrap {
+  position: relative;
+}
+
+.custom-select-wrap::after {
+  content: '▾';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #111111;
+  font-size: 1.1rem;
+  pointer-events: none;
+}
+
+.custom-select {
+  padding-right: 34px;
 }
 
 .segmented {
@@ -229,6 +253,45 @@ select:focus-visible {
   color: rgba(17, 17, 17, 0.75);
 }
 
+.weekend-selector {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  border-radius: 16px;
+  background: #f7f7f7;
+  padding: 14px 16px;
+}
+
+.weekend-selector > span {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.7);
+}
+
+.weekend-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.weekend-option {
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  background: #ffffff;
+  color: #111111;
+  border-radius: 999px;
+  padding: 8px 10px;
+  font: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weekend-option.selected {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
 .action-row {
   display: flex;
   justify-content: flex-end;
@@ -264,10 +327,20 @@ select:focus-visible {
   transform: translateY(-1px);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 18px 12px;
+  }
+
   .app-card {
     padding: 18px;
     border-radius: 18px;
+  }
+
+  .tab-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .field-row,
@@ -282,5 +355,20 @@ select:focus-visible {
   .primary,
   .secondary {
     width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .tab-nav {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .help-card,
+  .result-card {
+    padding: 14px;
   }
 }
