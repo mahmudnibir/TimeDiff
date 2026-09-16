@@ -254,6 +254,7 @@ function App() {
           <label className="input-block">
             <span>Quick mode</span>
             <input
+              className="app-field"
               type="text"
               value={quickInput}
               onChange={(event) => setQuickInput(event.target.value)}
@@ -281,11 +282,11 @@ function App() {
           <div className="field-row">
             <label>
               <span>From</span>
-              <input type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} />
+              <input className="app-field" type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} />
             </label>
             <label>
               <span>To</span>
-              <input type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
+              <input className="app-field" type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
             </label>
           </div>
 
@@ -312,11 +313,11 @@ function App() {
           <div className="field-row">
             <label>
               <span>Start</span>
-              <input type="text" value={fromTime} onChange={(event) => setFromTime(event.target.value)} placeholder="10:30 AM" />
+              <input className="app-field" type="text" value={fromTime} onChange={(event) => setFromTime(event.target.value)} placeholder="10:30 AM" />
             </label>
             <label>
               <span>End</span>
-              <input type="text" value={toTime} onChange={(event) => setToTime(event.target.value)} placeholder="6:45 PM" />
+              <input className="app-field" type="text" value={toTime} onChange={(event) => setToTime(event.target.value)} placeholder="6:45 PM" />
             </label>
           </div>
 
@@ -336,11 +337,11 @@ function App() {
           <div className="field-row single">
             <label>
               <span>Base date</span>
-              <input type="date" value={offsetDate} onChange={(event) => setOffsetDate(event.target.value)} />
+              <input className="app-field" type="date" value={offsetDate} onChange={(event) => setOffsetDate(event.target.value)} />
             </label>
             <label>
               <span>Days</span>
-              <input type="number" min="0" value={offsetDays} onChange={(event) => setOffsetDays(event.target.value)} />
+              <input className="app-field" type="number" min="0" value={offsetDays} onChange={(event) => setOffsetDays(event.target.value)} />
             </label>
           </div>
 
@@ -365,17 +366,18 @@ function App() {
           <div className="field-row">
             <label>
               <span>Start</span>
-              <input type="date" value={businessStart} onChange={(event) => setBusinessStart(event.target.value)} />
+              <input className="app-field" type="date" value={businessStart} onChange={(event) => setBusinessStart(event.target.value)} />
             </label>
             <label>
               <span>End</span>
-              <input type="date" value={businessEnd} onChange={(event) => setBusinessEnd(event.target.value)} />
+              <input className="app-field" type="date" value={businessEnd} onChange={(event) => setBusinessEnd(event.target.value)} />
             </label>
           </div>
 
           <label className="input-block">
             <span>Custom holidays</span>
             <input
+              className="app-field"
               type="text"
               value={holidayInput}
               onChange={(event) => setHolidayInput(event.target.value)}
@@ -431,12 +433,12 @@ function App() {
           <div className="field-row">
             <label>
               <span>ISO date</span>
-              <input type="datetime-local" value={timestampInput.slice(0, 16)} onChange={(event) => setTimestampInput(`${event.target.value}:00Z`)} />
+              <input className="app-field" type="datetime-local" value={timestampInput.slice(0, 16)} onChange={(event) => setTimestampInput(`${event.target.value}:00Z`)} />
             </label>
             <label>
               <span>Timezone</span>
               <div className="custom-select-wrap">
-                <select className="custom-select" value={timeZone} onChange={(event) => setTimeZone(event.target.value)}>
+                <select className="app-field custom-select" value={timeZone} onChange={(event) => setTimeZone(event.target.value)}>
                   {TIME_ZONES.map((zone) => (
                     <option key={zone} value={zone}>{zone}</option>
                   ))}
@@ -460,18 +462,18 @@ function App() {
         <div className="field-row">
           <label>
             <span>Start date</span>
-            <input type="date" value={recurringStart} onChange={(event) => setRecurringStart(event.target.value)} />
+            <input className="app-field" type="date" value={recurringStart} onChange={(event) => setRecurringStart(event.target.value)} />
           </label>
           <label>
             <span>Interval</span>
-            <input type="number" min="1" value={recurringInterval} onChange={(event) => setRecurringInterval(event.target.value)} />
+            <input className="app-field" type="number" min="1" value={recurringInterval} onChange={(event) => setRecurringInterval(event.target.value)} />
           </label>
         </div>
 
         <div className="field-row">
           <label>
             <span>Unit</span>
-            <select value={recurringUnit} onChange={(event) => setRecurringUnit(event.target.value)}>
+            <select className="app-field" value={recurringUnit} onChange={(event) => setRecurringUnit(event.target.value)}>
               <option value="day">Day</option>
               <option value="week">Week</option>
               <option value="month">Month</option>
@@ -479,7 +481,7 @@ function App() {
           </label>
           <label>
             <span>Count</span>
-            <input type="number" min="1" max="30" value={recurringCount} onChange={(event) => setRecurringCount(event.target.value)} />
+            <input className="app-field" type="number" min="1" max="30" value={recurringCount} onChange={(event) => setRecurringCount(event.target.value)} />
           </label>
         </div>
 

@@ -145,7 +145,7 @@ select {
   box-sizing: border-box;
   border: 1px solid rgba(17, 17, 17, 0.2);
   border-radius: 14px;
-  background: linear-gradient(180deg, #ffffff 0%, #f6f6f6 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
   color: #111111;
   padding: 12px 14px;
   font: inherit;
@@ -155,8 +155,36 @@ select {
   transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-input:focus-visible,
-select:focus-visible {
+input.app-field,
+select.app-field,
+.custom-select {
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  color: #111111;
+  padding: 12px 14px;
+  font: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+input.app-field[type='date'],
+input.app-field[type='datetime-local'] {
+  color-scheme: light;
+  background-image: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+}
+
+input.app-field:focus-visible,
+select.app-field:focus-visible,
+.custom-select:focus-visible,
+input.app-field:focus,
+select.app-field:focus,
+.custom-select:focus {
   outline: none;
   border-color: #111111;
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
@@ -169,8 +197,8 @@ select:focus-visible {
 .custom-select-wrap::after {
   content: '▾';
   position: absolute;
-  right: 16px;
   top: 50%;
+  right: 16px;
   transform: translateY(-50%);
   color: #111111;
   font-size: 1.1rem;
@@ -178,7 +206,7 @@ select:focus-visible {
 }
 
 .custom-select {
-  padding-right: 34px;
+  padding-right: 38px;
 }
 
 .segmented {
@@ -258,12 +286,51 @@ select:focus-visible {
   gap: 10px;
   border: 1px solid rgba(17, 17, 17, 0.16);
   border-radius: 16px;
+  padding: 14px 16px;
+  background: #f7f7f7;
+}
+
+.weekend-selector > span {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(17, 17, 17, 0.7);
+}
+
+.weekend-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.weekend-option {
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  background: #ffffff;
+  color: #111111;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weekend-option.selected {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+.weekend-selector {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  border-radius: 16px;
   background: #f7f7f7;
   padding: 14px 16px;
 }
 
 .weekend-selector > span {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(17, 17, 17, 0.7);
@@ -280,7 +347,7 @@ select:focus-visible {
   background: #ffffff;
   color: #111111;
   border-radius: 999px;
-  padding: 8px 10px;
+  padding: 7px 10px;
   font: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -365,10 +432,5 @@ select:focus-visible {
 
   h1 {
     font-size: 2rem;
-  }
-
-  .help-card,
-  .result-card {
-    padding: 14px;
   }
 }
