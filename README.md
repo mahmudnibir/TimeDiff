@@ -1,17 +1,25 @@
 # TimeDiff
 
-TimeDiff is a privacy-friendly date and time calculator built as a lightweight React app. It focuses on instant results, keyboard-friendly inputs, and a clean black-and-white interface without accounts, tracking, or backend dependencies.
+TimeDiff is a fast, private, browser-first time utility for repeated date and time workflows. It is built for people who need instant, structured calculations without explaining the task to a chatbot every time.
 
-## Features
+## What it does
 
-- Date difference calculator
-- Time difference calculator
+- Quick mode for natural inputs such as "45 days from today"
+- Date difference and duration calculations
 - Add and subtract days from a date
-- Exact age calculator
-- Business-day difference view
+- Business-day calculations with custom holiday support
+- Timezone conversion
+- Recurring date generation
 - Unix timestamp conversion
-- Mobile-friendly, minimal UI
-- Copy-to-clipboard result action
+- Shareable calculation links
+- Copy-to-clipboard results
+
+## Tech stack
+
+- React
+- Vite
+- Vitest
+- Browser-only local logic
 
 ## Local development
 
@@ -19,8 +27,6 @@ TimeDiff is a privacy-friendly date and time calculator built as a lightweight R
 npm install
 npm run dev
 ```
-
-Then open the local Vite URL shown in the terminal.
 
 ## Production build
 
@@ -34,6 +40,6 @@ npm run build
 npm test
 ```
 
-## Notes
+## Why this project exists
 
-This project intentionally keeps the MVP fast and offline-friendly. The logic is isolated in [src/timediff.js](src/timediff.js), and the UI is in [src/App.jsx](src/App.jsx).
+The product is built around a simple idea: people repeatedly need time math, and a dedicated local tool is more practical, private, and fast than asking a chatbot for the same calculation every time.

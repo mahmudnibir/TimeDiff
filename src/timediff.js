@@ -1,5 +1,14 @@
 const MS_PER_DAY = 1000 * 60 * 60 * 24
 
+export const TIME_ZONES = [
+  'UTC',
+  'Asia/Dhaka',
+  'Asia/Tokyo',
+  'America/New_York',
+  'Europe/London',
+  'Europe/Paris',
+]
+
 function normalizeDateInput(value) {
   if (!value) return null
 
@@ -13,6 +22,33 @@ function toIsoDate(date) {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
     .slice(0, 10)
+}
+
+function parseClock(value) {
+  if (!value) return null
+
+  const text = String(value).trim().toUpperCase()
+  const match = text.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?$/)
+
+  if (!match) return null
+
+  let hour = Number(match[1])
+  const minute = Number(match[2])
+  const suffix = match[3]
+
+  if (suffix === 'AM' && hour === 12) hour = 0
+  if (suffix === 'PM' && hour !== 12) hour += 12
+
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null
+
+  return hour * 60 + minute
+}
+
+function parseHolidayList(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
 }
 
 export function calculateDateDifference(fromDate, toDate) {
@@ -44,21 +80,14 @@ export function calculateDateDifference(fromDate, toDate) {
 }
 
 export function calculateTimeDifference(fromTime, toTime) {
-  const [fromHour, fromMinute] = String(fromTime).split(':').map(Number)
-  const [toHour, toMinute] = String(toTime).split(':').map(Number)
+  const fromMinutes = parseClock(fromTime)
+  const toMinutes = parseClock(toTime)
 
-  if (
-    Number.isNaN(fromHour) ||
-    Number.isNaN(fromMinute) ||
-    Number.isNaN(toHour) ||
-    Number.isNaN(toMinute)
-  ) {
-    throw new Error('Both times must be valid HH:MM values.')
+  if (fromMinutes === null || toMinutes === null) {
+    throw new Error('Both times must be valid values.')
   }
 
-  const fromTotalMinutes = fromHour * 60 + fromMinute
-  const toTotalMinutes = toHour * 60 + toMinute
-  const diff = toTotalMinutes - fromTotalMinutes
+  const diff = toMinutes - fromMinutes
 
   if (diff < 0) {
     throw new Error('End time must be later than start time.')
@@ -78,7 +107,7 @@ export function addDaysToDate(dateString, daysToAdd) {
   const base = normalizeDateInput(dateString)
   if (!base) throw new Error('The date must be valid.')
 
-  const ms = base.getTime() + daysToAdd * MS_PER_DAY
+  const ms = base.getTime() + Number(daysToAdd) * MS_PER_DAY
   return toIsoDate(new Date(ms))
 }
 
@@ -86,37 +115,11 @@ export function subtractDaysFromDate(dateString, daysToSubtract) {
   const base = normalizeDateInput(dateString)
   if (!base) throw new Error('The date must be valid.')
 
-  const ms = base.getTime() - daysToSubtract * MS_PER_DAY
+  const ms = base.getTime() - Number(daysToSubtract) * MS_PER_DAY
   return toIsoDate(new Date(ms))
 }
 
-export function calculateAge(dateOfBirth, asOfDate) {
-  const birth = normalizeDateInput(dateOfBirth)
-  const current = normalizeDateInput(asOfDate)
-
-  if (!birth || !current) {
-    throw new Error('Both dates must be valid values.')
-  }
-
-  let years = current.getUTCFullYear() - birth.getUTCFullYear()
-  let months = current.getUTCMonth() - birth.getUTCMonth()
-  let days = current.getUTCDate() - birth.getUTCDate()
-
-  if (days < 0) {
-    const previousMonth = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth(), 0))
-    days += previousMonth.getUTCDate()
-    months -= 1
-  }
-
-  if (months < 0) {
-    months += 12
-    years -= 1
-  }
-
-  return { years, months, days }
-}
-
-export function calculateBusinessDays(startDate, endDate) {
+export function calculateBusinessDays(startDate, endDate, options = {}) {
   const start = normalizeDateInput(startDate)
   const end = normalizeDateInput(endDate)
 
@@ -124,21 +127,33 @@ export function calculateBusinessDays(startDate, endDate) {
     throw new Error('Both dates must be valid values.')
   }
 
-  let businessDays = 0
+  const excludeWeekends = options.excludeWeekends ?? true
+  const holidays = parseHolidayList(options.holidays)
+  const holidaySet = new Set(holidays)
+
+  let workingDays = 0
   let weekendDays = 0
+  let holidayDays = 0
+  let totalDays = 0
   const current = new Date(start.getTime())
 
   while (current <= end) {
+    const isoDate = toIsoDate(current)
     const day = current.getUTCDay()
-    if (day === 0 || day === 6) {
+    totalDays += 1
+
+    if (holidaySet.has(isoDate)) {
+      holidayDays += 1
+    } else if (excludeWeekends && (day === 0 || day === 6)) {
       weekendDays += 1
     } else {
-      businessDays += 1
+      workingDays += 1
     }
+
     current.setUTCDate(current.getUTCDate() + 1)
   }
 
-  return { workingDays: businessDays, weekendDays }
+  return { workingDays, weekendDays, holidayDays, totalDays }
 }
 
 export function getWeekBreakdown(totalDays) {
@@ -162,6 +177,104 @@ export function convertToTimestamp(dateValue) {
   }
 
   return timestamp
+}
+
+export function generateRecurringDates(startDate, interval, unit, count) {
+  const start = normalizeDateInput(startDate)
+  if (!start) throw new Error('Start date is invalid.')
+
+  const safeInterval = Number(interval) || 1
+  const safeCount = Number(count) || 1
+  const results = []
+  let current = new Date(start.getTime())
+
+  for (let index = 0; index < safeCount; index += 1) {
+    results.push(toIsoDate(current))
+
+    if (unit === 'day') {
+      current = new Date(current.getTime() + safeInterval * MS_PER_DAY)
+    } else if (unit === 'week') {
+      current = new Date(current.getTime() + safeInterval * 7 * MS_PER_DAY)
+    } else if (unit === 'month') {
+      current = new Date(Date.UTC(current.getUTCFullYear(), current.getUTCMonth() + safeInterval, current.getUTCDate()))
+    } else {
+      throw new Error('Unsupported recurrence unit.')
+    }
+  }
+
+  return results
+}
+
+export function parseQuickInput(input, referenceDate = new Date().toISOString().slice(0, 10)) {
+  const text = String(input || '').trim()
+
+  if (!text) {
+    throw new Error('Quick input cannot be empty.')
+  }
+
+  const offsetMatch = text.match(/^(\d+)\s+days?\s+(?:from|after|plus)\s+(today|now|\d{4}-\d{2}-\d{2}|[A-Za-z]+\s+\d{1,2}\s+\d{4})$/i)
+  if (offsetMatch) {
+    const baseText = offsetMatch[2].toLowerCase()
+    const baseDate = baseText === 'today' || baseText === 'now' ? referenceDate : offsetMatch[2]
+
+    return {
+      kind: 'date-offset',
+      result: addDaysToDate(new Date(baseDate).toISOString().slice(0, 10), Number(offsetMatch[1])),
+    }
+  }
+
+  const dateRangeMatch = text.match(/^(.*?)(?:\s*(?:->|to)\s*)(.*)$/i)
+  if (dateRangeMatch) {
+    const left = dateRangeMatch[1].trim()
+    const right = dateRangeMatch[2].trim()
+    const parsedLeft = left ? new Date(left) : new Date(referenceDate)
+    const parsedRight = right ? new Date(right) : new Date(referenceDate)
+
+    if (!Number.isNaN(parsedLeft.getTime()) && !Number.isNaN(parsedRight.getTime())) {
+      return {
+        kind: 'date-difference',
+        result: calculateDateDifference(parsedLeft.toISOString().slice(0, 10), parsedRight.toISOString().slice(0, 10)),
+      }
+    }
+  }
+
+  const timeRangeMatch = text.match(/^(\d{1,2}:\d{2}\s*(?:AM|PM)?)\s*(?:->|to)\s*(\d{1,2}:\d{2}\s*(?:AM|PM)?)$/i)
+  if (timeRangeMatch) {
+    return {
+      kind: 'time-difference',
+      result: calculateTimeDifference(timeRangeMatch[1], timeRangeMatch[2]),
+    }
+  }
+
+  throw new Error('Unsupported quick input format.')
+}
+
+export function getTimeZoneTime(isoDate, timeZone) {
+  const time = new Date(isoDate)
+  const formatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  })
+
+  return `${formatter.format(time)} · ${timeZone}`
+}
+
+export function buildShareUrl(pathname, state) {
+  const params = new URLSearchParams()
+
+  Object.entries(state).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      params.set(key, String(value))
+    }
+  })
+
+  const query = params.toString()
+  return query ? `${pathname}?${query}` : pathname
 }
 
 export function formatDateForDisplay(dateValue) {
