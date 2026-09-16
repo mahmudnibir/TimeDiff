@@ -1,0 +1,220 @@
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.app-card {
+  width: min(960px, 100%);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #111111;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.08);
+  border-radius: 26px;
+  padding: 28px;
+}
+
+.topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.brand {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: #111111;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.06em;
+  font-weight: 700;
+  max-width: 620px;
+}
+
+.tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  border: 1px solid #111111;
+  background: #f5f5f5;
+  color: #111111;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover,
+.tab:focus-visible {
+  background: #111111;
+  color: #ffffff;
+  outline: none;
+}
+
+.tab.active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.tool-panel {
+  display: grid;
+  gap: 22px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.field-row.single {
+  grid-template-columns: 1.4fr 0.6fr;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #111111;
+}
+
+label span {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 12px;
+  background: #fafafa;
+  color: #111111;
+  padding: 12px 14px;
+  font: inherit;
+}
+
+input:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 2px;
+}
+
+.segmented {
+  display: inline-flex;
+  width: max-content;
+  border: 1px solid #111111;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.segmented button {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #111111;
+  padding: 10px 18px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.segmented button.active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.result-card {
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  background: #f8f8f8;
+  border-radius: 20px;
+  padding: 22px 20px;
+}
+
+.result-card.compact {
+  max-width: 480px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  color: rgba(17, 17, 17, 0.72);
+}
+
+.result-card h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.06em;
+  color: #111111;
+}
+
+.detail-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: rgba(17, 17, 17, 0.8);
+}
+
+.meta {
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  color: rgba(17, 17, 17, 0.75);
+}
+
+.action-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.primary {
+  border: none;
+  background: #111111;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary:hover,
+.primary:focus-visible {
+  background: #000000;
+  outline: none;
+}
+
+@media (max-width: 640px) {
+  .app-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .field-row,
+  .field-row.single {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row {
+    justify-content: stretch;
+  }
+
+  .primary {
+    width: 100%;
+  }
+}
