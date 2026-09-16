@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import {
     TIME_ZONES,
@@ -79,9 +79,33 @@ const formatDateValue = (date) => {
   return `${year}-${month}-${day}`
 }
 
+const usePickerDismiss = (isOpen, setIsOpen) => {
+  const pickerRef = useRef(null)
+
+  useEffect(() => {
+    if (!isOpen) return undefined
+
+    const closeFromOutside = (event) => {
+      if (!pickerRef.current?.contains(event.target)) setIsOpen(false)
+    }
+    const closeOnScroll = () => setIsOpen(false)
+
+    document.addEventListener('pointerdown', closeFromOutside, true)
+    window.addEventListener('scroll', closeOnScroll, true)
+
+    return () => {
+      document.removeEventListener('pointerdown', closeFromOutside, true)
+      window.removeEventListener('scroll', closeOnScroll, true)
+    }
+  }, [isOpen, setIsOpen])
+
+  return pickerRef
+}
+
 function DatePicker({ label, value, onChange }) {
   const selectedDate = parseDateValue(value)
   const [isOpen, setIsOpen] = useState(false)
+  const pickerRef = usePickerDismiss(isOpen, setIsOpen)
   const [visibleMonth, setVisibleMonth] = useState(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
   const monthLabel = visibleMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
   const firstDay = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1).getDay()
@@ -94,7 +118,7 @@ function DatePicker({ label, value, onChange }) {
   return (
     <div className="picker-field">
       <span>{label}</span>
-      <div className="date-picker">
+      <div className="date-picker" ref={pickerRef}>
         <button type="button" className="picker-trigger" onClick={() => setIsOpen((current) => !current)} aria-expanded={isOpen}>
           <span>{selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
           <span className="picker-icon" aria-hidden="true">▦</span>
@@ -149,12 +173,13 @@ function DateTimePicker({ value, onChange }) {
 function TimezonePicker({ value, onChange }) {
   const [isOpen, setIsOpen] = useState(false)
   const [query, setQuery] = useState('')
+  const pickerRef = usePickerDismiss(isOpen, setIsOpen)
   const filteredZones = TIME_ZONES.filter((zone) => zone.toLowerCase().includes(query.toLowerCase())).slice(0, 80)
 
   return (
     <div className="picker-field">
       <span>Timezone</span>
-      <div className="timezone-picker">
+      <div className="timezone-picker" ref={pickerRef}>
         <button type="button" className="picker-trigger" onClick={() => setIsOpen((current) => !current)} aria-expanded={isOpen}>
           <span>{value}</span>
           <span className="picker-icon" aria-hidden="true">⌄</span>
@@ -177,11 +202,12 @@ function TimezonePicker({ value, onChange }) {
 function OptionPicker({ label, value, options, onChange }) {
   const [isOpen, setIsOpen] = useState(false)
   const currentOption = options.find((option) => option.value === value)
+  const pickerRef = usePickerDismiss(isOpen, setIsOpen)
 
   return (
     <div className="picker-field">
       <span>{label}</span>
-      <div className="timezone-picker">
+      <div className="timezone-picker" ref={pickerRef}>
         <button type="button" className="picker-trigger" onClick={() => setIsOpen((current) => !current)} aria-expanded={isOpen}>
           <span>{currentOption?.label || value}</span>
           <span className="picker-icon" aria-hidden="true">⌄</span>
