@@ -67,6 +67,137 @@ const readInitialUrlState = () => {
   }
 }
 
+const parseDateValue = (value) => {
+  const [year, month, day] = value.split('-').map(Number)
+  return new Date(year, month - 1, day)
+}
+
+const formatDateValue = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+function DatePicker({ label, value, onChange }) {
+  const selectedDate = parseDateValue(value)
+  const [isOpen, setIsOpen] = useState(false)
+  const [visibleMonth, setVisibleMonth] = useState(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1))
+  const monthLabel = visibleMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+  const firstDay = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1).getDay()
+  const daysInMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 0).getDate()
+  const calendarDays = Array.from({ length: firstDay + daysInMonth }, (_, index) => {
+    if (index < firstDay) return null
+    return new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), index - firstDay + 1)
+  })
+
+  return (
+    <div className="picker-field">
+      <span>{label}</span>
+      <div className="date-picker">
+        <button type="button" className="picker-trigger" onClick={() => setIsOpen((current) => !current)} aria-expanded={isOpen}>
+          <span>{selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          <span className="picker-icon" aria-hidden="true">▦</span>
+        </button>
+        {isOpen && (
+          <div className="picker-popover" role="dialog" aria-label={`${label} calendar`}>
+            <div className="calendar-header">
+              <strong>{monthLabel}</strong>
+              <div className="calendar-nav">
+                <button type="button" onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1))} aria-label="Previous month">‹</button>
+                <button type="button" onClick={() => setVisibleMonth(new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1))} aria-label="Next month">›</button>
+              </div>
+            </div>
+            <div className="calendar-weekdays">{['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => <span key={`${day}-${index}`}>{day}</span>)}</div>
+            <div className="calendar-grid">
+              {calendarDays.map((day, index) => day ? (
+                <button
+                  type="button"
+                  key={formatDateValue(day)}
+                  className={formatDateValue(day) === value ? 'calendar-day selected' : 'calendar-day'}
+                  onClick={() => {
+                    onChange(formatDateValue(day))
+                    setIsOpen(false)
+                  }}
+                >
+                  {day.getDate()}
+                </button>
+              ) : <span className="calendar-empty" key={`empty-${index}`} />)}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function DateTimePicker({ value, onChange }) {
+  const dateValue = value.slice(0, 10)
+  const timeValue = value.slice(11, 16)
+
+  return (
+    <div className="picker-field">
+      <span>ISO date</span>
+      <div className="datetime-picker">
+        <DatePicker label="" value={dateValue} onChange={(nextDate) => onChange(`${nextDate}T${timeValue || '00:00'}:00Z`)} />
+        <input className="app-field time-field" type="text" inputMode="numeric" value={timeValue} placeholder="00:00" onChange={(event) => onChange(`${dateValue}T${event.target.value}:00Z`)} aria-label="Time" />
+      </div>
+    </div>
+  )
+}
+
+function TimezonePicker({ value, onChange }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const filteredZones = TIME_ZONES.filter((zone) => zone.toLowerCase().includes(query.toLowerCase())).slice(0, 80)
+
+  return (
+    <div className="picker-field">
+      <span>Timezone</span>
+      <div className="timezone-picker">
+        <button type="button" className="picker-trigger" onClick={() => setIsOpen((current) => !current)} aria-expanded={isOpen}>
+          <span>{value}</span>
+          <span className="picker-icon" aria-hidden="true">⌄</span>
+        </button>
+        {isOpen && (
+          <div className="timezone-popover" role="dialog" aria-label="Timezone picker">
+            <input autoFocus className="app-field timezone-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search timezones" />
+            <div className="timezone-options" role="listbox">
+              {filteredZones.map((zone) => (
+                <button type="button" role="option" aria-selected={zone === value} className={zone === value ? 'timezone-option selected' : 'timezone-option'} key={zone} onClick={() => { onChange(zone); setIsOpen(false); setQuery('') }}>{zone}</button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function OptionPicker({ label, value, options, onChange }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const currentOption = options.find((option) => option.value === value)
+
+  return (
+    <div className="picker-field">
+      <span>{label}</span>
+      <div className="timezone-picker">
+        <button type="button" className="picker-trigger" onClick={() => setIsOpen((current) => !current)} aria-expanded={isOpen}>
+          <span>{currentOption?.label || value}</span>
+          <span className="picker-icon" aria-hidden="true">⌄</span>
+        </button>
+        {isOpen && (
+          <div className="option-popover" role="listbox" aria-label={label}>
+            {options.map((option) => (
+              <button type="button" role="option" aria-selected={option.value === value} className={option.value === value ? 'timezone-option selected' : 'timezone-option'} key={option.value} onClick={() => { onChange(option.value); setIsOpen(false) }}>{option.label}</button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const today = new Date().toISOString().slice(0, 10)
   const initialUrlState = readInitialUrlState()
@@ -280,14 +411,8 @@ function App() {
         <div className="tool-panel">
           {helpCard}
           <div className="field-row">
-            <label>
-              <span>From</span>
-              <input className="app-field" type="date" value={fromDate} onChange={(event) => setFromDate(event.target.value)} />
-            </label>
-            <label>
-              <span>To</span>
-              <input className="app-field" type="date" value={toDate} onChange={(event) => setToDate(event.target.value)} />
-            </label>
+            <DatePicker label="From" value={fromDate} onChange={setFromDate} />
+            <DatePicker label="To" value={toDate} onChange={setToDate} />
           </div>
 
           <div className="result-card">
@@ -335,10 +460,7 @@ function App() {
         <div className="tool-panel">
           {helpCard}
           <div className="field-row single">
-            <label>
-              <span>Base date</span>
-              <input className="app-field" type="date" value={offsetDate} onChange={(event) => setOffsetDate(event.target.value)} />
-            </label>
+            <DatePicker label="Base date" value={offsetDate} onChange={setOffsetDate} />
             <label>
               <span>Days</span>
               <input className="app-field" type="number" min="0" value={offsetDays} onChange={(event) => setOffsetDays(event.target.value)} />
@@ -364,14 +486,8 @@ function App() {
         <div className="tool-panel">
           {helpCard}
           <div className="field-row">
-            <label>
-              <span>Start</span>
-              <input className="app-field" type="date" value={businessStart} onChange={(event) => setBusinessStart(event.target.value)} />
-            </label>
-            <label>
-              <span>End</span>
-              <input className="app-field" type="date" value={businessEnd} onChange={(event) => setBusinessEnd(event.target.value)} />
-            </label>
+            <DatePicker label="Start" value={businessStart} onChange={setBusinessStart} />
+            <DatePicker label="End" value={businessEnd} onChange={setBusinessEnd} />
           </div>
 
           <label className="input-block">
@@ -431,20 +547,8 @@ function App() {
         <div className="tool-panel">
           {helpCard}
           <div className="field-row">
-            <label>
-              <span>ISO date</span>
-              <input className="app-field" type="datetime-local" value={timestampInput.slice(0, 16)} onChange={(event) => setTimestampInput(`${event.target.value}:00Z`)} />
-            </label>
-            <label>
-              <span>Timezone</span>
-              <div className="custom-select-wrap">
-                <select className="app-field custom-select" value={timeZone} onChange={(event) => setTimeZone(event.target.value)}>
-                  {TIME_ZONES.map((zone) => (
-                    <option key={zone} value={zone}>{zone}</option>
-                  ))}
-                </select>
-              </div>
-            </label>
+            <DateTimePicker value={timestampInput} onChange={setTimestampInput} />
+            <TimezonePicker value={timeZone} onChange={setTimeZone} />
           </div>
 
           <div className="result-card compact">
@@ -460,10 +564,7 @@ function App() {
       <div className="tool-panel">
         {helpCard}
         <div className="field-row">
-          <label>
-            <span>Start date</span>
-            <input className="app-field" type="date" value={recurringStart} onChange={(event) => setRecurringStart(event.target.value)} />
-          </label>
+          <DatePicker label="Start date" value={recurringStart} onChange={setRecurringStart} />
           <label>
             <span>Interval</span>
             <input className="app-field" type="number" min="1" value={recurringInterval} onChange={(event) => setRecurringInterval(event.target.value)} />
@@ -473,11 +574,12 @@ function App() {
         <div className="field-row">
           <label>
             <span>Unit</span>
-            <select className="app-field" value={recurringUnit} onChange={(event) => setRecurringUnit(event.target.value)}>
-              <option value="day">Day</option>
-              <option value="week">Week</option>
-              <option value="month">Month</option>
-            </select>
+            <OptionPicker
+              label="Unit"
+              value={recurringUnit}
+              options={[{ value: 'day', label: 'Day' }, { value: 'week', label: 'Week' }, { value: 'month', label: 'Month' }]}
+              onChange={setRecurringUnit}
+            />
           </label>
           <label>
             <span>Count</span>

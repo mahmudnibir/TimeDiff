@@ -209,6 +209,180 @@ select.app-field:focus,
   padding-right: 38px;
 }
 
+.picker-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.picker-field > span {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.date-picker,
+.timezone-picker {
+  position: relative;
+}
+
+.picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  color: #111111;
+  padding: 12px 14px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.picker-trigger:hover,
+.picker-trigger:focus-visible {
+  outline: none;
+  border-color: #111111;
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
+}
+
+.picker-icon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.picker-popover,
+.timezone-popover,
+.option-popover {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(290px, calc(100vw - 48px));
+  border: 1px solid rgba(17, 17, 17, 0.2);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(17, 17, 17, 0.16);
+  padding: 14px;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.calendar-nav {
+  display: flex;
+  gap: 5px;
+}
+
+.calendar-nav button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(17, 17, 17, 0.16);
+  border-radius: 8px;
+  background: #f5f5f5;
+  color: #111111;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  text-align: center;
+}
+
+.calendar-weekdays {
+  margin-bottom: 6px;
+  color: rgba(17, 17, 17, 0.55);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #111111;
+  cursor: pointer;
+}
+
+.calendar-day:hover,
+.calendar-day:focus-visible {
+  border-color: #111111;
+  outline: none;
+}
+
+.calendar-day.selected {
+  background: #111111;
+  color: #ffffff;
+}
+
+.calendar-empty {
+  aspect-ratio: 1;
+}
+
+.datetime-picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 8px;
+}
+
+.datetime-picker .picker-field > span {
+  display: none;
+}
+
+.timezone-popover,
+.option-popover {
+  width: min(340px, calc(100vw - 48px));
+}
+
+.timezone-search {
+  margin-bottom: 10px;
+}
+
+.timezone-options {
+  display: grid;
+  max-height: 260px;
+  overflow-y: auto;
+  gap: 3px;
+}
+
+.timezone-option {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #111111;
+  padding: 9px 10px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.timezone-option:hover,
+.timezone-option:focus-visible,
+.timezone-option.selected {
+  outline: none;
+  background: #111111;
+  color: #ffffff;
+}
+
+.option-popover {
+  display: grid;
+  gap: 4px;
+}
+
 .segmented {
   display: inline-flex;
   width: max-content;
